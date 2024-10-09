@@ -12,7 +12,7 @@ cache_data = {"res": {}}
 
 # 应用变更
 async def update_xray():
-    g_logger.info("应用变更" + cache_data["res"]["nodes"])
+    g_logger.info("应用变更" + str(cache_data["res"]["nodes"]))
     xrayr_handler.gen_xrayr_config_yml(cache_data["res"])
     xrayr_handler.run_xrayr()
 

@@ -24,6 +24,7 @@ def run_xrayr():
     except Exception as e:
         g_logger.error(e)
     try:
+        g_logger.info("启动xrayr")
         client.containers.run(
             "ghcr.io/xrayr-project/xrayr:latest",
             detach=True,
