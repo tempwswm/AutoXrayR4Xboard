@@ -1,12 +1,11 @@
-import logging
 import os.path
 
 import docker
+import yaml
 from docker.errors import NotFound
 from docker.types import Mount
-import yaml
 
-from model import Node
+from helper import g_logger
 
 
 def run_xrayr():
@@ -23,7 +22,7 @@ def run_xrayr():
     except NotFound:
         pass
     except Exception as e:
-        logging.error(e)
+        g_logger.error(e)
     try:
         client.containers.run(
             "ghcr.io/xrayr-project/xrayr:latest",
@@ -35,7 +34,17 @@ def run_xrayr():
             restart_policy={"Name": "always"},
         )
     except Exception as e:
-        logging.error(e)
+        g_logger.error(e)
+
+
+def keep_xrayr():
+    client = docker.from_env()
+    try:
+        client.containers.get("xrayr")
+    except NotFound:
+        run_xrayr()
+    except Exception as e:
+        g_logger.error(e)
 
 
 def gen_nodes_yml(res):

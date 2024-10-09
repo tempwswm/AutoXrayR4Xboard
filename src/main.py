@@ -1,6 +1,7 @@
+import logging
 import click
-from starlette.requests import Request
 
+from helper import g_logger
 from node_handler import node_f
 from server_handler import server_f
 
@@ -16,6 +17,8 @@ from server_handler import server_f
 @click.option("--label", help="节点标签")
 @click.version_option("0.0.1", "-v", "--version", help="查看版本")
 def main(server, node, debug, url, board_email, board_password, board_url, label):
+    if debug:
+        g_logger.setLevel(logging.DEBUG)
     if server:
         server_f(url, board_url, board_email, board_password)
     else:

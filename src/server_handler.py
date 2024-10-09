@@ -1,16 +1,12 @@
 import asyncio
-import datetime
-import random
-import string
-from urllib.parse import urlsplit, urlparse
+from urllib.parse import urlsplit
 
-import click
 import httpx
-import starlette
 import uvicorn
 from fastapi import FastAPI
 
 import helper
+from helper import g_logger
 
 cache_data = {
     "headers": {"authorization": ""},
@@ -67,7 +63,7 @@ async def get_nodes():
             )
 
     except Exception as e:
-        click.echo(e)
+        g_logger.error(e)
 
 
 async def get_config():
@@ -81,19 +77,19 @@ async def get_config():
             int(response.json()["data"]["server"]["server_pull_interval"]) / 2
         )
     except Exception as e:
-        click.echo(e)
+        g_logger.error(e)
 
 
 async def init_update():
     await board_login()
     task = asyncio.create_task(board_update())
 
-    click.echo("初始化完成")
+    g_logger.info("初始化完成")
 
 
 def server_f(url, board_url, board_email, board_password):
     if board_email is None or board_password is None or board_url is None:
-        click.echo("请输入面板邮箱和密码")
+        g_logger.error("请输入面板邮箱和密码")
         exit(1)
 
     base_url, token = helper.split_url(url)
@@ -108,5 +104,5 @@ def server_f(url, board_url, board_email, board_password):
     app = FastAPI()
     app.get(f"/{token}")(hello)
     app.on_event("startup")(init_update)
-    click.echo("连接密钥：" + token)
+    g_logger.debug("连接密钥：" + token)
     uvicorn.run(app, host="0.0.0.0", port=port)
