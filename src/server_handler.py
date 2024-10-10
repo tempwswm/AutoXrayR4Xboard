@@ -1,27 +1,64 @@
 import asyncio
+import datetime
 from urllib.parse import urlsplit
 
 import httpx
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 import helper
 from helper import g_logger
 
 cache_data = {
+    "interval": 10,
     "headers": {"authorization": ""},
     "nodes": {},
+    "labels": {"board": {"ip": "127.0.0.1", "last_connect": datetime.datetime.now()}},
 }
 httpx_client = httpx.AsyncClient(headers=cache_data["headers"])
 
 
-async def hello(label: str):
-    return {
+def update_label_record(label, ip):
+    if (  # 这里有逻辑短路所以不会有KeyError
+        label not in cache_data["labels"]  # 没有记录就新增
+        or cache_data["labels"][label]["ip"] == ip  # IP相同更新时间
+        # IP不相同且老IP离线超过 间隔时间的10倍，就更新
+        or (
+            cache_data["labels"][label]["ip"] != ip
+            and datetime.datetime.now() - cache_data["labels"][label]["last_connect"]
+            > datetime.timedelta(seconds=(10 * cache_data["interval"]))
+        )
+    ):
+        cache_data["labels"][label] = {
+            "ip": ip,
+            "last_connect": datetime.datetime.now(),
+        }
+
+
+def is_label_use_ip(label, ip):
+    return cache_data["labels"][label]["ip"] == ip
+
+
+async def hello(label: str, request: Request):
+
+    update_label_record(label, request.client.host)
+
+    ret = {
         "board_base_url": cache_data["board_base_url"],
         "interval": cache_data["interval"],
         "board_token": cache_data["board_token"],
         "nodes": cache_data["nodes"].get(label, []),
     }
+
+    if is_label_use_ip(label, request.client.host):
+        return ret
+    else:
+        ret["board_base_url"] = None
+        ret["board_token"] = None
+        ret["interval"] = 60
+        ret["nodes"] = []
+
+        return ret
 
 
 async def board_login():
