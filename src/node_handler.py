@@ -42,5 +42,5 @@ async def cycle(url, label):
         await asyncio.sleep(cache_data["res"].get("interval", 10))
 
 
-def node_f(url, label):
+def node_f(url, label, cert):
     asyncio.run(cycle(url, label))

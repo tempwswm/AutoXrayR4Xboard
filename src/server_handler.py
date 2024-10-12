@@ -10,7 +10,7 @@ import helper
 from helper import g_logger
 
 cache_data = {
-    "interval": 10,
+    "interval": 10.0,
     "headers": {"authorization": ""},
     "nodes": {},
     "labels": {"board": {"ip": "127.0.0.1", "last_connect": datetime.datetime.now()}},
@@ -87,7 +87,7 @@ async def get_nodes():
         )
         cache_data["nodes"] = {}
         for node in response.json()["data"]:
-            label = node["ips"][0]
+            label = node["ips"][0] if node["ips"] else ""
             node_type = node["type"]
             node_id = node["id"]
 

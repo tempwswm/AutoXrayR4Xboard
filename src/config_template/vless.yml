@@ -1,0 +1,23 @@
+PanelType: "NewV2board" # Panel type: SSpanel, V2board, NewV2board, PMpanel, Proxypanel, V2RaySocks
+ApiConfig:
+  ApiHost: "http://127.0.0.1:668"
+  ApiKey: "123"
+  NodeID: 4
+  NodeType: Vless # Node type: V2ray, Shadowsocks, Trojan
+  Timeout: 30 # Timeout for the api request
+  EnableVless: true # Enable Vless for V2ray Type
+  EnableXTLS: true # Enable XTLS for V2ray and Trojan
+  SpeedLimit: 0 # Mbps, Local settings will replace remote settings
+  DeviceLimit: 0 # Local settings will replace remote settings
+
+ControllerConfig:
+  ListenIP: 0.0.0.0 # IP address you want to listen
+  UpdatePeriodic: 10 # Time to update the nodeinfo, how many sec.
+  EnableDNS: false # Use custom DNS config, Please ensure that you set the dns.json well
+  EnableFallback: true # FallBack Switch
+  FallBackConfigs: # Support multiple fallbacks
+    - SNI: # TLS SNI(Server Name Indication), Empty for any
+      Alpn: # Alpn, Empty for any
+      Path: # HTTP PATH, Empty for any
+      Dest: github.com:443 # Required, Destination of fallback, check https://xtls.github.io/config/features/fallback.html for details.
+      ProxyProtocolVer: 0
